@@ -162,9 +162,6 @@ func TestTreeReverseIterateByOffset(t *testing.T) {
 	}
 }
 
-// Verify that Tree implements avl.ITree
-// var _ avl.ITree = (*Tree)(nil) // TODO: fix gnovm bug: ./examples/gno.land/p/moul/cow: test pkg: panic: gno.land/p/moul/cow/tree_test.gno:166:5: name avl not defined in fileset with files [node.gno tree.gno node_test.gno tree_test.gno]:
-
 func TestCopyOnWrite(t *testing.T) {
 	// Create original tree
 	original := NewTree()

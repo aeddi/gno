@@ -41,7 +41,10 @@
 //	val, _ := original.Get("key1") // Returns "value1"
 package cow
 
-type IterCbFn func(key string, value interface{}) bool
+import "gno.land/p/demo/avl"
+
+// Verify that Tree implements avl.ITree
+var _ avl.ITree = (*Tree)(nil)
 
 //----------------------------------------
 // Tree
@@ -102,7 +105,7 @@ func (tree *Tree) Remove(key string) (value interface{}, removed bool) {
 // Iterate performs an in-order traversal of the tree within the specified key range.
 // It calls the provided callback function for each key-value pair encountered.
 // If the callback returns true, the iteration is stopped.
-func (tree *Tree) Iterate(start, end string, cb IterCbFn) bool {
+func (tree *Tree) Iterate(start, end string, cb avl.IterCbFn) bool {
 	return tree.node.TraverseInRange(start, end, true, true,
 		func(node *Node) bool {
 			return cb(node.Key(), node.Value())
@@ -113,7 +116,7 @@ func (tree *Tree) Iterate(start, end string, cb IterCbFn) bool {
 // ReverseIterate performs a reverse in-order traversal of the tree within the specified key range.
 // It calls the provided callback function for each key-value pair encountered.
 // If the callback returns true, the iteration is stopped.
-func (tree *Tree) ReverseIterate(start, end string, cb IterCbFn) bool {
+func (tree *Tree) ReverseIterate(start, end string, cb avl.IterCbFn) bool {
 	return tree.node.TraverseInRange(start, end, false, true,
 		func(node *Node) bool {
 			return cb(node.Key(), node.Value())
@@ -124,7 +127,7 @@ func (tree *Tree) ReverseIterate(start, end string, cb IterCbFn) bool {
 // IterateByOffset performs an in-order traversal of the tree starting from the specified offset.
 // It calls the provided callback function for each key-value pair encountered, up to the specified count.
 // If the callback returns true, the iteration is stopped.
-func (tree *Tree) IterateByOffset(offset int, count int, cb IterCbFn) bool {
+func (tree *Tree) IterateByOffset(offset int, count int, cb avl.IterCbFn) bool {
 	return tree.node.TraverseByOffset(offset, count, true, true,
 		func(node *Node) bool {
 			return cb(node.Key(), node.Value())
@@ -135,7 +138,7 @@ func (tree *Tree) IterateByOffset(offset int, count int, cb IterCbFn) bool {
 // ReverseIterateByOffset performs a reverse in-order traversal of the tree starting from the specified offset.
 // It calls the provided callback function for each key-value pair encountered, up to the specified count.
 // If the callback returns true, the iteration is stopped.
-func (tree *Tree) ReverseIterateByOffset(offset int, count int, cb IterCbFn) bool {
+func (tree *Tree) ReverseIterateByOffset(offset int, count int, cb avl.IterCbFn) bool {
 	return tree.node.TraverseByOffset(offset, count, false, true,
 		func(node *Node) bool {
 			return cb(node.Key(), node.Value())
