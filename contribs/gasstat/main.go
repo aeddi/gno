@@ -4,7 +4,9 @@ import (
 	"context"
 	"os"
 
+	"github.com/gnolang/gno/contribs/gasstat/internal/analyze"
 	"github.com/gnolang/gno/contribs/gasstat/internal/convert"
+	"github.com/gnolang/gno/contribs/gasstat/internal/measure"
 	"github.com/gnolang/gno/tm2/pkg/commands"
 )
 
@@ -21,7 +23,9 @@ func main() {
 	)
 
 	cmd.AddSubCommands(
-		convert.NewConvertBalancesCmd(io),
+		analyze.NewAnalyzeCmd(io),
+		convert.NewConvertCmd(io),
+		measure.NewMeasureCmd(io),
 	)
 
 	cmd.Execute(context.Background(), os.Args[1:])
