@@ -2,7 +2,6 @@ package convert
 
 import (
 	"context"
-	"flag"
 	"fmt"
 
 	"github.com/gnolang/gno/contribs/gasstat/pkg/distribution"
@@ -28,35 +27,10 @@ func newConvertBalancesCmd(io commands.IO) *commands.Command {
 }
 
 func execConvertBalances(args []string, io commands.IO) error {
-	// Check if the number of arguments is valid.
-	if len(args) != 2 {
-		io.ErrPrintln("error: invalid number of arguments, expected an input file and an output file")
-		return flag.ErrHelp
-	}
-
-	var (
-		inputFile    = args[0]
-		outputFile   = args[1]
-		inputFormat  = file.FileFormatFromExt(inputFile)
-		outputFormat = file.FileFormatFromExt(outputFile)
-	)
-
-	// Check if the input file format is supported.
-	if inputFormat == file.Unknown {
-		io.ErrPrintfln("error: unsupported input file format: %s", inputFile)
-		return flag.ErrHelp
-	}
-
-	// Check if the output file format is supported.
-	if outputFormat == file.Unknown {
-		io.ErrPrintfln("error: unsupported output file format: %s", outputFile)
-		return flag.ErrHelp
-	}
-
-	// Check if the input and output file formats are the same.
-	if inputFormat == outputFormat {
-		io.ErrPrintfln("error: input and output file formats must be different: %s", inputFormat)
-		return flag.ErrHelp
+	// Get the input and output files from the command line arguments.
+	inputFile, outputFile, err := file.GetInputOutputFiles(args, io, true)
+	if err != nil {
+		return err
 	}
 
 	// Get the balances from the input file.

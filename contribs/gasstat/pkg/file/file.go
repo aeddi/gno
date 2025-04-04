@@ -12,13 +12,14 @@ type FileFormat uint8
 const (
 	Unknown FileFormat = iota
 	JSON
+	YAML
 	CSV
 	TXT
 )
 
 // String implements the Stringer interface for FileFormat.
 func (f FileFormat) String() string {
-	return []string{"Unknown", "JSON", "CSV", "TXT"}[f]
+	return []string{"Unknown", "JSON", "YAML", "CSV", "TXT"}[f]
 }
 
 // FileFormatFromExt returns the FileFormat based on the file extension.
@@ -31,6 +32,8 @@ func FileFormatFromExt(filename string) FileFormat {
 	switch extension {
 	case ".json":
 		return JSON
+	case ".yaml":
+		return YAML
 	case ".csv":
 		return CSV
 	case ".txt":

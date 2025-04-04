@@ -227,12 +227,12 @@ func LoadFromJson(filename string) (*Distribution, error) {
 func LoadFromFile(filename string) (*Distribution, error) {
 	// Determine the file format based on the file extension.
 	switch file.FileFormatFromExt(filename) {
-	case file.JSON:
-		return LoadFromJson(filename)
-	case file.CSV:
-		return LoadFromCsv(filename)
 	case file.TXT:
 		return LoadFromTxt(filename)
+	case file.CSV:
+		return LoadFromCsv(filename)
+	case file.JSON:
+		return LoadFromJson(filename)
 	default:
 		return nil, fmt.Errorf("unsupported file format: %s", filename)
 	}
@@ -344,12 +344,12 @@ func (d *Distribution) SaveToJson(filename string) error {
 func (d *Distribution) SaveToFile(filename string) error {
 	// Determine the file format based on the file extension.
 	switch file.FileFormatFromExt(filename) {
-	case file.JSON:
-		return d.SaveToJson(filename)
-	case file.CSV:
-		return d.SaveToCsv(filename)
 	case file.TXT:
 		return d.SaveToTxt(filename)
+	case file.CSV:
+		return d.SaveToCsv(filename)
+	case file.JSON:
+		return d.SaveToJson(filename)
 	default:
 		return fmt.Errorf("unsupported file format: %s", filename)
 	}
