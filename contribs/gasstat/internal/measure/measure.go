@@ -10,7 +10,7 @@ import (
 	"github.com/gnolang/gno/tm2/pkg/commands"
 )
 
-const defaultRemote = " 127.0.0.1:26657"
+const defaultRemote = "127.0.0.1:26657"
 
 type measureFlags struct {
 	remote string
