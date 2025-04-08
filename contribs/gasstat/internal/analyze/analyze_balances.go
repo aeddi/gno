@@ -3,63 +3,86 @@ package analyze
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
 
 	"github.com/gnolang/gno/contribs/gasstat/pkg/balances"
+	"github.com/gnolang/gno/contribs/gasstat/pkg/file"
 	"github.com/gnolang/gno/contribs/gasstat/pkg/stats"
 	"github.com/gnolang/gno/tm2/pkg/commands"
+	"gopkg.in/yaml.v3"
 )
 
-// newAnalyzeBalancesCmd returns a command that allows users process a balances file
-// and produce statistics.
-func newAnalyzeBalancesCmd(io commands.IO) *commands.Command {
+// newAnalyzeDistributionCmd returns a command that allows users process a balances file
+// and produce a distribution statistics report.
+func newAnalyzeDistributionCmd(io commands.IO) *commands.Command {
 	return commands.NewCommand(
 		commands.Metadata{
-			Name:       "balances",
-			ShortUsage: "analyze balances <raw-balances-file>",
-			ShortHelp:  "process a balances file to produce statistics",
-			LongHelp:   "Process a balances file to produce statistics on distribution. Supported input formats are: json, txt and csv.\nThe format is determined by the file extension.",
+			Name:       "distribution",
+			ShortUsage: "analyze distribution <balances-file> <report-file>",
+			ShortHelp:  "process a balances file to produce distribution statistics",
+			LongHelp:   "Process a balances file to produce statistics on distribution. Supported balances file formats are: json, txt and csv.\nSupported report file formats are: json, yaml and md.\nThe format is determined by the file extension.",
 		},
 		commands.NewEmptyConfig(),
 		func(_ context.Context, args []string) error {
-			return execAnalyzeBalances(args, io)
+			return execAnalyzeDistribution(args, io)
 		},
 	)
 }
 
-func execAnalyzeBalances(args []string, io commands.IO) error {
-	// Check if the number of arguments is valid.
-	if len(args) != 1 {
-		io.ErrPrintln("error: invalid number of arguments, expected a balances input file")
+func execAnalyzeDistribution(args []string, io commands.IO) error {
+	// Get the balances and report files from the command line arguments.
+	balancesFile, reportFile, err := file.GetInputOutputFiles(args, io, false)
+	if err != nil {
+		return err
+	}
+
+	// Check if the report file has a valid extension.
+	reportFileFormat := file.FileFormatFromExt(reportFile)
+	if reportFileFormat != file.JSON &&
+		reportFileFormat != file.YAML &&
+		reportFileFormat != file.MARKDOWN {
+		io.ErrPrintln("error: invalid report file format, supported formats are: json, yaml and md")
 		return flag.ErrHelp
 	}
 
-	var (
-		inputFile  = args[0]
-		outputFile = "./report.json" // TODO: add a flag for the output file.
-	)
-
 	// Get the balances from the input file.
-	balances, err := balances.LoadFromFile(inputFile)
+	balances, err := balances.LoadFromFile(balancesFile)
 	if err != nil {
 		return fmt.Errorf("error: failed to load balances from input file: %w", err)
 	}
 
-	// Process the balances and produce a distribution statistics report.
-	statistics := stats.NewDistribution(balances)
-	jsonBytes, err := json.MarshalIndent(statistics, "", "  ")
-	if err != nil {
-		return fmt.Errorf("error: failed to marshal distribution statistics to JSON: %w", err)
+	// Process the balances and produce a distribution distribution report.
+	distribution := stats.NewDistribution(balances)
+
+	// Marshal the distribution statistics to the specified format.
+	var reportBytes []byte
+	switch reportFileFormat {
+	case file.JSON:
+		reportBytes, err = json.MarshalIndent(distribution, "", "  ")
+		if err != nil {
+			return fmt.Errorf("error: failed to marshal distribution statistics to JSON: %w", err)
+		}
+
+	case file.YAML:
+		reportBytes, err = yaml.Marshal(distribution)
+		if err != nil {
+			return fmt.Errorf("error: failed to marshal distribution statistics to YAML: %w", err)
+		}
+
+	case file.MARKDOWN:
+		// TODO: Implement markdown format support.
+		return errors.New("error: markdown format is not supported yet")
 	}
 
-	// Write the statistics report to the output file.
-	if err := os.WriteFile(outputFile, jsonBytes, 0644); err != nil {
-		return fmt.Errorf("error: failed to write statistics to output file: %w", err)
+	// Write the distribution statistics to the report file.
+	if err := os.WriteFile(reportFile, reportBytes, 0644); err != nil {
+		return fmt.Errorf("error: failed to write distribution statistics to output file: %w", err)
 	}
 
-	io.Printfln("Statistics report written to %s", outputFile)
+	io.Printfln("Distribution statistics report written to %s", reportFile)
 
 	return nil
 }

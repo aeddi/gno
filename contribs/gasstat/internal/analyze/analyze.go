@@ -17,7 +17,8 @@ func NewAnalyzeCmd(io commands.IO) *commands.Command {
 	)
 
 	cmd.AddSubCommands(
-		newAnalyzeBalancesCmd(io),
+		newAnalyzeDistributionCmd(io),
+		newAnalyzeUsageCmd(io),
 	)
 
 	return cmd

@@ -15,11 +15,12 @@ const (
 	YAML
 	CSV
 	TXT
+	MARKDOWN
 )
 
 // String implements the Stringer interface for FileFormat.
 func (f FileFormat) String() string {
-	return []string{"Unknown", "JSON", "YAML", "CSV", "TXT"}[f]
+	return []string{"Unknown", "JSON", "YAML", "CSV", "TXT", "MARKDOWN"}[f]
 }
 
 // FileFormatFromExt returns the FileFormat based on the file extension.
@@ -32,12 +33,14 @@ func FileFormatFromExt(filename string) FileFormat {
 	switch extension {
 	case ".json":
 		return JSON
-	case ".yaml":
+	case ".yaml", ".yml":
 		return YAML
 	case ".csv":
 		return CSV
 	case ".txt":
 		return TXT
+	case ".md":
+		return MARKDOWN
 	default:
 		return Unknown
 	}
