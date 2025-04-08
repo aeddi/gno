@@ -1,4 +1,4 @@
-package distribution
+package balances
 
 import (
 	"bufio"
@@ -18,8 +18,8 @@ import (
 	"github.com/gnolang/gno/tm2/pkg/std"
 )
 
-// Distribution represents a distribution of balances (address:amount).
-type Distribution struct {
+// Balances represents a list of balances (address:amount).
+type Balances struct {
 	Balances []gnoland.Balance `json:"balances"`
 }
 
@@ -58,7 +58,7 @@ func validateAmount(amount std.Coins) error {
 // The file should contain one account per line, with the tm2 address and balance
 // separated by an equals sign and followed by ugnot.
 // Example: g1p3ucd3ptpw902fluyjzhq3ffgq4ntddatev7s5=42027010477582ugnot
-func LoadFromTxt(filename string) (*Distribution, error) {
+func LoadFromTxt(filename string) (*Balances, error) {
 	// Open the file for reading.
 	file, err := os.Open(filename)
 	if err != nil {
@@ -67,9 +67,9 @@ func LoadFromTxt(filename string) (*Distribution, error) {
 	defer file.Close()
 
 	var (
-		scanner = bufio.NewScanner(file)
-		distrib = new(Distribution)
-		lineNum = 0
+		scanner  = bufio.NewScanner(file)
+		balances = new(Balances)
+		lineNum  = 0
 	)
 
 	// Read the file line by line.
@@ -102,22 +102,22 @@ func LoadFromTxt(filename string) (*Distribution, error) {
 			return nil, fmt.Errorf("invalid balance at line %d: %w", lineNum, err)
 		}
 
-		// Append the balance to the distribution.
-		distrib.Balances = append(distrib.Balances, balance)
+		// Append the balance to the balance list.
+		balances.Balances = append(balances.Balances, balance)
 	}
 
 	if err := scanner.Err(); err != nil {
 		return nil, fmt.Errorf("scanning txt file failed: %w", err)
 	}
 
-	return distrib, nil
+	return balances, nil
 }
 
 // LoadFromCsv loads account balances from a CSV file.
 // The file should contain one account per line, with the tm2 address and balance
 // separated by a comma. The first line optionally contains the column names.
 // Example: g1p3ucd3ptpw902fluyjzhq3ffgq4ntddatev7s5,42027010477582
-func LoadFromCsv(filename string) (*Distribution, error) {
+func LoadFromCsv(filename string) (*Balances, error) {
 	// Open the file for reading.
 	file, err := os.Open(filename)
 	if err != nil {
@@ -127,7 +127,7 @@ func LoadFromCsv(filename string) (*Distribution, error) {
 
 	var (
 		csvReader = csv.NewReader(file)
-		distrib   = new(Distribution)
+		balances  = new(Balances)
 		lineNum   = 0
 	)
 
@@ -186,29 +186,29 @@ func LoadFromCsv(filename string) (*Distribution, error) {
 			}
 		}
 
-		// Append the balance to the distribution.
-		distrib.Balances = append(distrib.Balances, balance)
+		// Append the balance to the balance list.
+		balances.Balances = append(balances.Balances, balance)
 	}
 
-	return distrib, nil
+	return balances, nil
 }
 
 // LoadFromJson loads account balances from a JSON file.
-func LoadFromJson(filename string) (*Distribution, error) {
+func LoadFromJson(filename string) (*Balances, error) {
 	// Read the file content.
 	content, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
 
-	// Unmarshal the JSON content into a Distribution struct.
-	distrib := new(Distribution)
-	if err := json.Unmarshal(content, &distrib); err != nil {
+	// Unmarshal the JSON content into a Balances struct.
+	balances := new(Balances)
+	if err := json.Unmarshal(content, &balances); err != nil {
 		return nil, err
 	}
 
 	// Filter out all coins that are not in ugnot and validate each amount.
-	for i, balance := range distrib.Balances {
+	for i, balance := range balances.Balances {
 		// Delete all coins that are not in ugnot.
 		balance.Amount = slices.DeleteFunc(balance.Amount, func(c std.Coin) bool {
 			return c.Denom != ugnot.Denom
@@ -220,11 +220,11 @@ func LoadFromJson(filename string) (*Distribution, error) {
 		}
 	}
 
-	return distrib, nil
+	return balances, nil
 }
 
 // LoadFromFile loads account balances from a file based on the file extension.
-func LoadFromFile(filename string) (*Distribution, error) {
+func LoadFromFile(filename string) (*Balances, error) {
 	// Determine the file format based on the file extension.
 	switch file.FileFormatFromExt(filename) {
 	case file.TXT:
@@ -239,7 +239,7 @@ func LoadFromFile(filename string) (*Distribution, error) {
 }
 
 // BalanceAmounts returns a slice of the balance amounts.
-func (d *Distribution) BalanceAmounts() []float64 {
+func (d *Balances) BalanceAmounts() []float64 {
 	// Allocate a slice of float64 for the balance amounts.
 	balances := make([]float64, len(d.Balances))
 
@@ -254,8 +254,8 @@ func (d *Distribution) BalanceAmounts() []float64 {
 	return balances
 }
 
-// SaveToTxt saves the distribution to a text file.
-func (d *Distribution) SaveToTxt(filename string) error {
+// SaveToTxt saves the balances to a text file.
+func (d *Balances) SaveToTxt(filename string) error {
 	// Allocate a slice of strings for the balance lines.
 	lines := make([]string, len(d.Balances))
 
@@ -276,8 +276,8 @@ func (d *Distribution) SaveToTxt(filename string) error {
 	return nil
 }
 
-// SaveToCsv saves the distribution to a CSV file.
-func (d *Distribution) SaveToCsv(filename string) error {
+// SaveToCsv saves the balances to a CSV file.
+func (d *Balances) SaveToCsv(filename string) error {
 	// Open the file for writing.
 	file, err := os.Create(filename)
 	if err != nil {
@@ -317,8 +317,8 @@ func (d *Distribution) SaveToCsv(filename string) error {
 	return nil
 }
 
-// SaveToJson saves the distribution to a JSON file.
-func (d *Distribution) SaveToJson(filename string) error {
+// SaveToJson saves the balances to a JSON file.
+func (d *Balances) SaveToJson(filename string) error {
 	// Validate each balance amount.
 	for i, balance := range d.Balances {
 		if err := validateAmount(balance.Amount); err != nil {
@@ -326,7 +326,7 @@ func (d *Distribution) SaveToJson(filename string) error {
 		}
 	}
 
-	// Marshal the Distribution struct into JSON.
+	// Marshal the Balances struct into JSON.
 	content, err := json.MarshalIndent(d, "", "  ")
 	if err != nil {
 		return err
@@ -340,8 +340,8 @@ func (d *Distribution) SaveToJson(filename string) error {
 	return nil
 }
 
-// SaveToFile saves the distribution to a file based on the file extension.
-func (d *Distribution) SaveToFile(filename string) error {
+// SaveToFile saves the balances to a file based on the file extension.
+func (d *Balances) SaveToFile(filename string) error {
 	// Determine the file format based on the file extension.
 	switch file.FileFormatFromExt(filename) {
 	case file.TXT:

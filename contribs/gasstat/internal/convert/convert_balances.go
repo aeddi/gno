@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gnolang/gno/contribs/gasstat/pkg/distribution"
+	"github.com/gnolang/gno/contribs/gasstat/pkg/balances"
 	"github.com/gnolang/gno/contribs/gasstat/pkg/file"
 	"github.com/gnolang/gno/tm2/pkg/commands"
 )
@@ -34,7 +34,7 @@ func execConvertBalances(args []string, io commands.IO) error {
 	}
 
 	// Get the balances from the input file.
-	balances, err := distribution.LoadFromFile(inputFile)
+	balances, err := balances.LoadFromFile(inputFile)
 	if err != nil {
 		return fmt.Errorf("error: failed to load balances from input file: %w", err)
 	}

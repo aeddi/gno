@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gnolang/gno/contribs/gasstat/pkg/distribution"
+	"github.com/gnolang/gno/contribs/gasstat/pkg/balances"
 	"github.com/gnolang/gno/contribs/gasstat/pkg/stats"
 	"github.com/gnolang/gno/tm2/pkg/commands"
 )
@@ -42,16 +42,16 @@ func execAnalyzeBalances(args []string, io commands.IO) error {
 	)
 
 	// Get the balances from the input file.
-	balances, err := distribution.LoadFromFile(inputFile)
+	balances, err := balances.LoadFromFile(inputFile)
 	if err != nil {
 		return fmt.Errorf("error: failed to load balances from input file: %w", err)
 	}
 
-	// Process the balances and produce a statistics report.
-	statistics := stats.NewFromDistribution(balances)
+	// Process the balances and produce a distribution statistics report.
+	statistics := stats.NewDistribution(balances)
 	jsonBytes, err := json.MarshalIndent(statistics, "", "  ")
 	if err != nil {
-		return fmt.Errorf("error: failed to marshal statistics to JSON: %w", err)
+		return fmt.Errorf("error: failed to marshal distribution statistics to JSON: %w", err)
 	}
 
 	// Write the statistics report to the output file.
