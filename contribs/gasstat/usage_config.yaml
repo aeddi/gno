@@ -1,0 +1,141 @@
+chain_id: dev
+
+# Accounts used for operations (random and test1)
+accounts:
+    - casino measure digital ritual faculty prosper common wife kiss warrior twin man enforce topic retire dinosaur devote cabbage food pair deer velvet pencil become
+    - source bonus chronic canvas draft south burst lottery vacant surface solve popular case indicate oppose farm nothing bullet exhibit title speed wink action roast
+
+# Realm function usage
+calls:
+    # Register account 0 as a gnoland/user (required by demo/boards)
+    - account_index: 0
+      gasfee: 10000000ugnot
+      gaswanted: 300000000
+      pkg_path: gno.land/r/gnoland/users/v1
+      func: Register
+      send:
+          - denom: ugnot
+            amount: 1000000
+      args:
+          - [test123]
+
+    # Boards usage
+    # =============
+    # Create 10 boards
+    - account_index: 0
+      gasfee: 10000000ugnot
+      gaswanted: 300000000
+      pkg_path: gno.land/r/demo/boards
+      func: CreateBoard
+      args:
+          - [board1]
+          - [board2]
+          - [board3]
+          - [board4]
+          - [board5]
+          - [board6]
+          - [board7]
+          - [board8]
+          - [board9]
+          - [board10]
+
+    # Get ID from 10 created boards
+    - account_index: 0
+      gasfee: 10000000ugnot
+      gaswanted: 300000000
+      pkg_path: gno.land/r/demo/boards
+      func: GetBoardIDFromName
+      args:
+          - [board1]
+          - [board2]
+          - [board3]
+          - [board4]
+          - [board5]
+          - [board6]
+          - [board7]
+          - [board8]
+          - [board9]
+          - [board10]
+
+    # Create 10 threads (one for each board)
+    - account_index: 0
+      gasfee: 10000000ugnot
+      gaswanted: 300000000
+      pkg_path: gno.land/r/demo/boards
+      func: CreateThread
+      args:
+          - [1, thread1, body1]
+          - [2, thread2, body2]
+          - [3, thread3, body3]
+          - [4, thread4, body4]
+          - [5, thread5, body5]
+          - [6, thread6, body6]
+          - [7, thread7, body7]
+          - [8, thread8, body8]
+          - [9, thread9, body9]
+          - [10, thread10, body10]
+
+    # Create 10 posts
+    - account_index: 0
+      gasfee: 10000000ugnot
+      gaswanted: 300000000
+      pkg_path: gno.land/r/demo/boards
+      func: CreateReply
+      args:
+          - [1, 1, 1, body1]
+          - [2, 1, 1, body2]
+          - [3, 1, 1, body3]
+          - [4, 1, 1, body4]
+          - [5, 1, 1, body5]
+          - [6, 1, 1, body6]
+          - [7, 1, 1, body7]
+          - [8, 1, 1, body8]
+          - [9, 1, 1, body9]
+          - [10, 1, 1, body10]
+
+    # Delete 10 posts
+    - account_index: 0
+      gasfee: 10000000ugnot
+      gaswanted: 300000000
+      pkg_path: gno.land/r/demo/boards
+      func: DeletePost
+      args:
+          - [1, 1, 2, reason1]
+          - [2, 1, 2, reason2]
+          - [3, 1, 2, reason3]
+          - [4, 1, 2, reason4]
+          - [5, 1, 2, reason5]
+          - [6, 1, 2, reason6]
+          - [7, 1, 2, reason7]
+          - [8, 1, 2, reason8]
+          - [9, 1, 2, reason9]
+          - [10, 1, 2, reason10]
+
+# Bank transfers usage
+transfers:
+    # Transfer 10 increasing amounts from account 1 to 0
+    - account_index: 1
+      gasfee: 10000000ugnot
+      gaswanted: 300000000
+      to_account_index: 0
+      amounts:
+          - - denom: ugnot
+              amount: 10
+          - - denom: ugnot
+              amount: 100
+          - - denom: ugnot
+              amount: 1000
+          - - denom: ugnot
+              amount: 10000
+          - - denom: ugnot
+              amount: 100000
+          - - denom: ugnot
+              amount: 1000000
+          - - denom: ugnot
+              amount: 10000000
+          - - denom: ugnot
+              amount: 100000000
+          - - denom: ugnot
+              amount: 1000000000
+          - - denom: ugnot
+              amount: 10000000000

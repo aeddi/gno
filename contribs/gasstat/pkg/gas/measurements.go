@@ -11,37 +11,37 @@ import (
 	"github.com/gnolang/gno/tm2/pkg/std"
 )
 
-// Usage represents the gas usage for different operations.
-type Usage struct {
-	Calls   []CallUsage   `json:"calls" yaml:"calls"`
-	Runs    []RunUsage    `json:"runs" yaml:"runs"`
-	Sends   []SendUsage   `json:"sends" yaml:"sends"`
-	AddPkgs []AddPkgUsage `json:"add_pkgs" yaml:"add_pkgs"`
+// Measurements represents the gas Measurements for different operations.
+type Measurements struct {
+	Calls     []CallMeasurement     `json:"calls" yaml:"calls"`
+	Runs      []RunMeasurement      `json:"runs" yaml:"runs"`
+	Transfers []TransferMeasurement `json:"transfers" yaml:"transfers"`
+	AddPkgs   []AddPkgMeasurement   `json:"add_pkgs" yaml:"add_pkgs"`
 }
 
-// CallUsage represents the gas usage for a function call.
-type CallUsage struct {
+// CallMeasurement represents the gas measurement for a function call.
+type CallMeasurement struct {
 	PkgPath string `json:"pkg_path" yaml:"pkg_path"`
 	Func    string `json:"func" yaml:"func"`
 	ExecResult
 }
 
-// RunUsage represents the gas usage for a run operation.
-type RunUsage struct {
+// RunMeasurement represents the gas measurement for a run operation.
+type RunMeasurement struct {
 	Files []File `json:"file_list" yaml:"file_list"`
 	ExecResult
 }
 
-// SendUsage represents the gas usage for a send operation.
-type SendUsage struct {
+// TransferMeasurement represents the gas measurement for a transfer operation.
+type TransferMeasurement struct {
 	FromAddress crypto.Address `json:"from_address" yaml:"from_address"`
 	ToAddress   crypto.Address `json:"to_address" yaml:"to_address"`
 	Amount      std.Coins      `json:"amount" yaml:"amount"`
 	ExecResult
 }
 
-// AddPkgUsage represents the gas usage for adding a package.
-type AddPkgUsage struct {
+// AddPkgMeasurement represents the gas measurement for adding a package.
+type AddPkgMeasurement struct {
 	PkgPath string    `json:"pkg_path" yaml:"pkg_path"`
 	Files   []File    `json:"mem_files" yaml:"mem_files"`
 	Deposit std.Coins `json:"deposit" yaml:"deposit"`
@@ -50,8 +50,10 @@ type AddPkgUsage struct {
 
 // ExecResult represents the result of an execution.
 type ExecResult struct {
-	Duration time.Duration `json:"duration" yaml:"duration"`
-	GasUsed  int64         `json:"gas_used" yaml:"gas_used"`
+	GasFee    int64         `json:"gas_fee" yaml:"gas_fee"`
+	GasWanted int64         `json:"gas_wanted" yaml:"gas_wanted"`
+	GasUsed   int64         `json:"gas_used" yaml:"gas_used"`
+	Duration  time.Duration `json:"duration" yaml:"duration"`
 }
 
 // File represents a file with its path, size, and SHA256 checksum.
@@ -61,41 +63,33 @@ type File struct {
 	Sha256Sum string `json:"sha256_sum" yaml:"sha256_sum"`
 }
 
-// LoadFromTxt loads gas usage from a TXT file.
-func LoadFromTxt(filename string) (*Usage, error) {
-	// TODO: Implement TXT loading logic.
-	return nil, fmt.Errorf("TXT loading not implemented")
-}
-
-// LoadFromCsv loads gas usage from a CSV file.
-func LoadFromCsv(filename string) (*Usage, error) {
+// LoadFromCsv loads gas measurements from a CSV file.
+func LoadFromCsv(filename string) (*Measurements, error) {
 	// TODO: Implement CSV loading logic.
 	return nil, fmt.Errorf("CSV loading not implemented")
 }
 
-// LoadFromJson loads gas usage from a JSON file.
-func LoadFromJson(filename string) (*Usage, error) {
+// LoadFromJson loads gas measurements from a JSON file.
+func LoadFromJson(filename string) (*Measurements, error) {
 	// Read the file content.
 	content, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
 
-	// Unmarshal the JSON content into an Usage struct.
-	usage := new(Usage)
-	if err := json.Unmarshal(content, &usage); err != nil {
+	// Unmarshal the JSON content into an Measurements struct.
+	measurements := new(Measurements)
+	if err := json.Unmarshal(content, &measurements); err != nil {
 		return nil, err
 	}
 
-	return usage, nil
+	return measurements, nil
 }
 
-// LoadFromFile loads gas usage from a file based on the file extension.
-func LoadFromFile(filename string) (*Usage, error) {
+// LoadFromFile loads gas measurements from a file based on the file extension.
+func LoadFromFile(filename string) (*Measurements, error) {
 	// Determine the file format based on the file extension.
 	switch file.FileFormatFromExt(filename) {
-	case file.TXT:
-		return LoadFromTxt(filename)
 	case file.CSV:
 		return LoadFromCsv(filename)
 	case file.JSON:
@@ -105,19 +99,15 @@ func LoadFromFile(filename string) (*Usage, error) {
 	}
 }
 
-// SaveToTxt saves the gas usage to a CSV file.
-func (u *Usage) SaveToTxt(filename string) error {
-	return fmt.Errorf("TXT saving not implemented")
-}
-
-// SaveToCsv saves the gas usage to a CSV file.
-func (u *Usage) SaveToCsv(filename string) error {
+// SaveToCsv saves the gas measurements to a CSV file.
+func (u *Measurements) SaveToCsv(filename string) error {
+	// TODO: Implement CSV saving logic.
 	return fmt.Errorf("CSV saving not implemented")
 }
 
-// SaveToJson saves the gas usage to a JSON file.
-func (u *Usage) SaveToJson(filename string) error {
-	// Marshal the Usage struct into JSON.
+// SaveToJson saves the gas measurements to a JSON file.
+func (u *Measurements) SaveToJson(filename string) error {
+	// Marshal the Measurements struct into JSON.
 	content, err := json.MarshalIndent(u, "", "  ")
 	if err != nil {
 		return err
@@ -131,12 +121,10 @@ func (u *Usage) SaveToJson(filename string) error {
 	return nil
 }
 
-// SaveToFile saves the gas usage to a file based on the file extension.
-func (u *Usage) SaveToFile(filename string) error {
+// SaveToFile saves the gas measurements to a file based on the file extension.
+func (u *Measurements) SaveToFile(filename string) error {
 	// Determine the file format based on the file extension.
 	switch file.FileFormatFromExt(filename) {
-	case file.TXT:
-		return u.SaveToTxt(filename)
 	case file.CSV:
 		return u.SaveToCsv(filename)
 	case file.JSON:
