@@ -1,16 +1,19 @@
+# Global vars for gas fee and gas wanted
+define: &globalGasValues
+    gasfee: 10000000ugnot
+    gaswanted: 300000000
+
 chain_id: dev
 
-# Accounts used for operations (random and test1)
+# Accounts used for operations (randomly generated & funded using ./deposit_funds.yaml)
 accounts:
     - casino measure digital ritual faculty prosper common wife kiss warrior twin man enforce topic retire dinosaur devote cabbage food pair deer velvet pencil become
-    - source bonus chronic canvas draft south burst lottery vacant surface solve popular case indicate oppose farm nothing bullet exhibit title speed wink action roast
+    - direct tooth sheriff pistol people eternal category rigid elite owner travel chunk cruise picture acoustic soldier urban proof antenna tide unfold taste endorse update
 
-# Realm function usage
 calls:
     # Register account 0 as a gnoland/user (required by demo/boards)
     - account_index: 0
-      gasfee: 10000000ugnot
-      gaswanted: 300000000
+      <<: *globalGasValues
       pkg_path: gno.land/r/gnoland/users/v1
       func: Register
       send:
@@ -19,12 +22,9 @@ calls:
       args:
           - [test123]
 
-    # Boards usage
-    # =============
     # Create 10 boards
     - account_index: 0
-      gasfee: 10000000ugnot
-      gaswanted: 300000000
+      <<: *globalGasValues
       pkg_path: gno.land/r/demo/boards
       func: CreateBoard
       args:
@@ -41,8 +41,7 @@ calls:
 
     # Get ID from 10 created boards
     - account_index: 0
-      gasfee: 10000000ugnot
-      gaswanted: 300000000
+      <<: *globalGasValues
       pkg_path: gno.land/r/demo/boards
       func: GetBoardIDFromName
       args:
@@ -59,8 +58,7 @@ calls:
 
     # Create 10 threads (one for each board)
     - account_index: 0
-      gasfee: 10000000ugnot
-      gaswanted: 300000000
+      <<: *globalGasValues
       pkg_path: gno.land/r/demo/boards
       func: CreateThread
       args:
@@ -77,8 +75,7 @@ calls:
 
     # Create 10 posts
     - account_index: 0
-      gasfee: 10000000ugnot
-      gaswanted: 300000000
+      <<: *globalGasValues
       pkg_path: gno.land/r/demo/boards
       func: CreateReply
       args:
@@ -95,8 +92,7 @@ calls:
 
     # Delete 10 posts
     - account_index: 0
-      gasfee: 10000000ugnot
-      gaswanted: 300000000
+      <<: *globalGasValues
       pkg_path: gno.land/r/demo/boards
       func: DeletePost
       args:
@@ -110,32 +106,3 @@ calls:
           - [8, 1, 2, reason8]
           - [9, 1, 2, reason9]
           - [10, 1, 2, reason10]
-
-# Bank transfers usage
-transfers:
-    # Transfer 10 increasing amounts from account 1 to 0
-    - account_index: 1
-      gasfee: 10000000ugnot
-      gaswanted: 300000000
-      to_account_index: 0
-      amounts:
-          - - denom: ugnot
-              amount: 10
-          - - denom: ugnot
-              amount: 100
-          - - denom: ugnot
-              amount: 1000
-          - - denom: ugnot
-              amount: 10000
-          - - denom: ugnot
-              amount: 100000
-          - - denom: ugnot
-              amount: 1000000
-          - - denom: ugnot
-              amount: 10000000
-          - - denom: ugnot
-              amount: 100000000
-          - - denom: ugnot
-              amount: 1000000000
-          - - denom: ugnot
-              amount: 10000000000

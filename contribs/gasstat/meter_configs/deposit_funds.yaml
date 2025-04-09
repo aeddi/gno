@@ -1,0 +1,27 @@
+chain_id: dev
+
+accounts:
+    # test1
+    - source bonus chronic canvas draft south burst lottery vacant surface solve popular case indicate oppose farm nothing bullet exhibit title speed wink action roast
+    # 2 randomly generated accounts to fund
+    - casino measure digital ritual faculty prosper common wife kiss warrior twin man enforce topic retire dinosaur devote cabbage food pair deer velvet pencil become
+    - direct tooth sheriff pistol people eternal category rigid elite owner travel chunk cruise picture acoustic soldier urban proof antenna tide unfold taste endorse update
+
+transfers:
+    # test1 funds random account #1
+    - account_index: 0
+      gasfee: 10000000ugnot
+      gaswanted: 300000000
+      to_account_index: 1
+      amounts:
+          - - denom: ugnot
+              amount: 1000000000000
+
+    # test1 funds random account #2
+    - account_index: 0
+      gasfee: 10000000ugnot
+      gaswanted: 300000000
+      to_account_index: 2
+      amounts:
+          - - denom: ugnot
+              amount: 1000000000000

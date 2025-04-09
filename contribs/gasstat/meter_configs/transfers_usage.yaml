@@ -1,0 +1,34 @@
+chain_id: dev
+
+# Accounts used for operations (randomly generated & funded using ./deposit_funds.yaml)
+accounts:
+    - casino measure digital ritual faculty prosper common wife kiss warrior twin man enforce topic retire dinosaur devote cabbage food pair deer velvet pencil become
+    - direct tooth sheriff pistol people eternal category rigid elite owner travel chunk cruise picture acoustic soldier urban proof antenna tide unfold taste endorse update
+
+transfers:
+    # Transfer 10 increasing amounts from account 1 to 0
+    - account_index: 1
+      gasfee: 10000000ugnot
+      gaswanted: 300000000
+      to_account_index: 0
+      amounts:
+          - - denom: ugnot
+              amount: 10
+          - - denom: ugnot
+              amount: 100
+          - - denom: ugnot
+              amount: 1000
+          - - denom: ugnot
+              amount: 10000
+          - - denom: ugnot
+              amount: 100000
+          - - denom: ugnot
+              amount: 1000000
+          - - denom: ugnot
+              amount: 10000000
+          - - denom: ugnot
+              amount: 100000000
+          - - denom: ugnot
+              amount: 1000000000
+          - - denom: ugnot
+              amount: 10000000000
