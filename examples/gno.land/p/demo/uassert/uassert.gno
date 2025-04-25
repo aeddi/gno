@@ -411,6 +411,7 @@ func isNumberEmpty(n any) (isNumber, isEmpty bool) {
 	}
 	return false, false
 }
+
 func Empty(t TestingT, obj any, msgs ...string) bool {
 	t.Helper()
 
