@@ -226,10 +226,97 @@ func writeValue(p *printer, verb rune, arg any) {
 		p.buf.writeString(strconv.FormatFloat(v, 'g', -1, 64))
 	case string:
 		p.buf.writeString(v)
-	case []byte:
-		p.buf.write(v)
-	case []rune:
-		p.buf.writeString(string(v))
+  case []bool:
+    for i := range v {
+      if i > 0 {
+        p.buf.writeString(" ")
+      }
+      writeBool(p, verb, v[i])
+    }
+  case []int:
+    for i := range v {
+      if i > 0 {
+        p.buf.writeString(" ")
+      }
+      p.buf.writeString(strconv.Itoa(v[i]))
+    }
+  case []int8:
+    for i := range v {
+      if i > 0 {
+        p.buf.writeString(" ")
+      }
+      p.buf.writeString(strconv.Itoa(int(v[i])))
+    }
+  case []int16:
+    for i := range v {
+      if i > 0 {
+        p.buf.writeString(" ")
+      }
+      p.buf.writeString(strconv.Itoa(int(v[i])))
+    }
+  case []int32:
+    for i := range v {
+      if i > 0 {
+        p.buf.writeString(" ")
+      }
+      p.buf.writeString(strconv.Itoa(int(v[i])))
+    }
+  case []int64:
+    for i := range v {
+      if i > 0 {
+        p.buf.writeString(" ")
+      }
+      p.buf.writeString(strconv.Itoa(int(v[i])))
+    }
+  case []uint:
+    for i := range v {
+      if i > 0 {
+        p.buf.writeString(" ")
+      }
+      p.buf.writeString(strconv.FormatUint(uint64(v[i]), 10))
+    }
+  case []uint8:
+    for i := range v {
+      if i > 0 {
+        p.buf.writeString(" ")
+      }
+      p.buf.writeString(strconv.FormatUint(uint64(v[i]), 10))
+    }
+  case []uint16:
+    for i := range v {
+      if i > 0 {
+        p.buf.writeString(" ")
+      }
+      p.buf.writeString(strconv.FormatUint(uint64(v[i]), 10))
+    }
+  case []uint32:
+    for i := range v {
+      if i > 0 {
+        p.buf.writeString(" ")
+      }
+      p.buf.writeString(strconv.FormatUint(uint64(v[i]), 10))
+    }
+  case []uint64:
+    for i := range v {
+      if i > 0 {
+        p.buf.writeString(" ")
+      }
+      p.buf.writeString(strconv.FormatUint(v[i], 10))
+    }
+  case []float64:
+    for i := range v {
+      if i > 0 {
+        p.buf.writeString(" ")
+      }
+      p.buf.writeString(strconv.FormatFloat(v[i], 'g', -1, 64))
+    }
+  case []string:
+    for i := range v {
+      if i > 0 {
+        p.buf.writeString(" ")
+      }
+      p.buf.writeString(v[i])
+    }
 	case (interface{ String() string }):
 		p.buf.writeString(v.String())
 	case error:
