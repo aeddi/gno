@@ -6,6 +6,7 @@ import (
 	"gno.land/p/demo/ufmt"
 	"gno.land/r/gov/dao"
 	"gno.land/r/gov/dao/v3/memberstore"
+	"gno.land/r/gov/dao/v3/treasury"
 )
 
 func NewChangeLawRequest(cur realm, newLaw *Law) dao.ProposalRequest {
@@ -38,7 +39,8 @@ func NewUpgradeDaoImplRequest(newDao dao.DAO, realmPkg, reason string) dao.Propo
 		// therefore we must cross back into v3/impl and then
 		// cross call dao.UpdateRequest().
 		func(cur realm) {
-			dao.UpdateImpl(cross, dao.UpdateRequest{DAO: newDao,
+			dao.UpdateImpl(cross, dao.UpdateRequest{
+				DAO:         newDao,
 				AllowedDAOs: []string{"gno.land/r/gov/dao/v3/impl", realmPkg}, // keeping previous realm just in case something went wrong
 			})
 		}(cross)
@@ -144,6 +146,44 @@ func NewPromoteMemberRequest(addr std.Address, fromTier string, toTier string) d
 	)
 }
 
+func NewTreasuryPaymentRequest(cur realm, payment treasury.Payment, reason string) dao.ProposalRequest {
+	if treasury.HasBanker(payment.BankerID()) {
+		panic("banker not registered in treasury with ID: " + payment.BankerID())
+	}
+
+	if reason == "" {
+		panic("treasury payment request requires a reason")
+	}
+
+	cb := func() error {
+		err := error(nil)
+		func(cur realm) {
+			err = panicToError(func() {
+        treasury.Send(cross, payment)
+      })
+		}(cross)
+
+		return err
+	}
+
+	// NOTE: Should this be a NewSafeExecutor instead?
+	e := dao.NewSimpleExecutor(
+		cb,
+		ufmt.Sprintf(
+			"A payment will be sent by the GovDAO treasury.\n\nReason: %s\n\nPayment: %s.",
+			reason,
+			payment.String(),
+		),
+	)
+
+	// NOTE: Should this be filtered by tier?
+	return dao.NewProposalRequest(
+		"Treasury Payment",
+		"This proposal is looking to send a payment using the treasury.",
+		e,
+	)
+}
+
 func memberByTier(tier string) *memberstore.Member {
 	switch tier {
 	case memberstore.T1:
@@ -164,4 +204,25 @@ func memberByTier(tier string) *memberstore.Member {
 	default:
 		panic("member not found by the specified tier")
 	}
+}
+
+// panicToError executes a function that might panic and, if it does,
+// catches the panic and converts it into an error.
+func panicToError(f func()) err error {
+  // Catch any panic that might occur and convert it to an error.
+  defer func() {
+     if r := recover(); r != nil {
+       switch v := r.(type) {
+       case string:
+         err = errors.New(v)
+       case error:
+         err = v
+       default:
+         err = errors.New(ufmt.Sprint(v))
+       }
+     }
+  }()
+
+  // Execute the function that might panic.
+  f()
 }
