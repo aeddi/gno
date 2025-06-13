@@ -1,9 +1,9 @@
 package impl
 
 import (
-	"errors"
 	"std"
 
+	"gno.land/p/aeddi/utils"
 	trs_pkg "gno.land/p/demo/treasury"
 	"gno.land/p/demo/ufmt"
 
@@ -161,7 +161,7 @@ func NewTreasuryPaymentRequest(cur realm, payment trs_pkg.Payment, reason string
 	cb := func() error {
 		err := error(nil)
 		func(cur realm) {
-			err = panicToError(func() {
+			err = utils.PanicToError(func() {
 				treasury.Send(cross, payment)
 			})
 		}(cross)
@@ -207,27 +207,4 @@ func memberByTier(tier string) *memberstore.Member {
 	default:
 		panic("member not found by the specified tier")
 	}
-}
-
-// panicToError executes a function that might panic and, if it does,
-// catches the panic and converts it into an error.
-func panicToError(mightPanic func()) (err error) {
-	// Catch any panic that might occur and convert it to an error.
-	defer func() {
-		if r := recover(); r != nil {
-			switch v := r.(type) {
-			case string:
-				err = errors.New(v)
-			case error:
-				err = v
-			default:
-				err = errors.New(ufmt.Sprint(v))
-			}
-		}
-	}()
-
-	// Execute the function that might panic.
-	mightPanic()
-
-	return nil
 }
