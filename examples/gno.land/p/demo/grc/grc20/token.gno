@@ -62,7 +62,7 @@ func (tok Token) Allowance(owner, spender std.Address) int64 {
 	return tok.ledger.allowance(owner, spender)
 }
 
-func (tok *Token) RenderHome() string {
+func (tok Token) RenderHome() string {
 	str := ""
 	str += ufmt.Sprintf("# %s ($%s)\n\n", tok.name, tok.symbol)
 	str += ufmt.Sprintf("* **Decimals**: %d\n", tok.decimals)

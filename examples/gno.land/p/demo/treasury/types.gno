@@ -1,6 +1,8 @@
 package treasury
 
 import (
+	"errors"
+
 	"gno.land/p/demo/avl"
 	"gno.land/p/demo/mux"
 )
@@ -21,7 +23,7 @@ type bankerRecord struct {
 // Banker is an interface that allows for banking operations.
 type Banker interface {
 	ID() string          // Get the ID of the banker.
-	Send(Payment)        // Send a payment to a recipient.
+	Send(Payment) error  // Send a payment to a recipient.
 	Balances() []Balance // Get the balances of the banker.
 	Address() string     // Get the address of the banker to receive payments.
 }
@@ -37,3 +39,10 @@ type Balance struct {
 	Denom  string // The denomination of the asset
 	Amount int64  // The amount of the asset
 }
+
+// Common Banker errors.
+var (
+	ErrCurrentRealmIsNotOwner = errors.New("current realm is not the owner of the banker")
+	ErrNoOwnerProvided        = errors.New("no owner provided")
+	ErrInvalidPaymentType     = errors.New("invalid payment type")
+)

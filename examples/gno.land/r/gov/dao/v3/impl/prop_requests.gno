@@ -1,9 +1,12 @@
 package impl
 
 import (
+	"errors"
 	"std"
 
+	trs_pkg "gno.land/p/demo/treasury"
 	"gno.land/p/demo/ufmt"
+
 	"gno.land/r/gov/dao"
 	"gno.land/r/gov/dao/v3/memberstore"
 	"gno.land/r/gov/dao/v3/treasury"
@@ -146,7 +149,7 @@ func NewPromoteMemberRequest(addr std.Address, fromTier string, toTier string) d
 	)
 }
 
-func NewTreasuryPaymentRequest(cur realm, payment treasury.Payment, reason string) dao.ProposalRequest {
+func NewTreasuryPaymentRequest(cur realm, payment trs_pkg.Payment, reason string) dao.ProposalRequest {
 	if treasury.HasBanker(payment.BankerID()) {
 		panic("banker not registered in treasury with ID: " + payment.BankerID())
 	}
@@ -159,8 +162,8 @@ func NewTreasuryPaymentRequest(cur realm, payment treasury.Payment, reason strin
 		err := error(nil)
 		func(cur realm) {
 			err = panicToError(func() {
-        treasury.Send(cross, payment)
-      })
+				treasury.Send(cross, payment)
+			})
 		}(cross)
 
 		return err
@@ -208,21 +211,23 @@ func memberByTier(tier string) *memberstore.Member {
 
 // panicToError executes a function that might panic and, if it does,
 // catches the panic and converts it into an error.
-func panicToError(f func()) err error {
-  // Catch any panic that might occur and convert it to an error.
-  defer func() {
-     if r := recover(); r != nil {
-       switch v := r.(type) {
-       case string:
-         err = errors.New(v)
-       case error:
-         err = v
-       default:
-         err = errors.New(ufmt.Sprint(v))
-       }
-     }
-  }()
+func panicToError(mightPanic func()) (err error) {
+	// Catch any panic that might occur and convert it to an error.
+	defer func() {
+		if r := recover(); r != nil {
+			switch v := r.(type) {
+			case string:
+				err = errors.New(v)
+			case error:
+				err = v
+			default:
+				err = errors.New(ufmt.Sprint(v))
+			}
+		}
+	}()
 
-  // Execute the function that might panic.
-  f()
+	// Execute the function that might panic.
+	mightPanic()
+
+	return nil
 }

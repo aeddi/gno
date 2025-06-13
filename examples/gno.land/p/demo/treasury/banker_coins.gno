@@ -6,7 +6,8 @@ import (
 
 // CoinsBanker is a Banker that sends std.Coins.
 type CoinsBanker struct {
-	ownAddress std.Address // The address of this coins banker owner.
+	owner  std.Address // The address of this coins banker owner.
+	banker std.Banker  // The underlying std banker, must be a BankerTypeRealmSend.
 }
 
 var _ Banker = (*CoinsBanker)(nil)
@@ -17,23 +18,26 @@ func (CoinsBanker) ID() string {
 }
 
 // Send implements Banker.
-func (cb *CoinsBanker) Send(p Payment) {
+func (cb *CoinsBanker) Send(p Payment) error {
+	if std.CurrentRealm().Address() != cb.owner {
+		return ErrCurrentRealmIsNotOwner
+	}
 	// Check if payment is of type coinsPayment.
 	payment, ok := p.(coinsPayment)
 	if !ok {
-		panic("Payment must be of type coinsPayment")
+		return ErrInvalidPaymentType
 	}
 
 	// Send the coins.
-	banker := std.NewBanker(std.BankerTypeRealmSend)
-	banker.SendCoins(cb.ownAddress, payment.toAddress, payment.coins)
+	cb.banker.SendCoins(cb.owner, payment.toAddress, payment.coins)
+
+	return nil
 }
 
 // Balances implements Banker.
 func (cb *CoinsBanker) Balances() []Balance {
 	// Get the coins from the banker.
-	banker := std.NewBanker(std.BankerTypeReadOnly)
-	coins := banker.GetCoins(cb.ownAddress)
+	coins := cb.banker.GetCoins(cb.owner)
 
 	// Convert std.Coins to []Balance.
 	balances := make([]Balance, len(coins))
@@ -49,25 +53,30 @@ func (cb *CoinsBanker) Balances() []Balance {
 
 // Address implements Banker.
 func (cb *CoinsBanker) Address() string {
-	return cb.ownAddress.String()
+	return cb.owner.String()
 }
 
 // NewCoinsBanker creates a new CoinsBanker with the current Realm's address
 // as the owner.
-func NewCoinsBanker() *CoinsBanker {
+func NewCoinsBanker(banker std.Banker) *CoinsBanker {
 	owner := std.CurrentRealm().Address()
 
-	return NewCoinsBankerWithOwner(std.Address{})
+	return NewCoinsBankerWithOwner(owner, banker)
 }
 
 // NewCoinsBankerWithOwner creates a new CoinsBanker with the given address.
-func NewCoinsBankerWithOwner(owner std.Address) *CoinsBanker {
+func NewCoinsBankerWithOwner(owner std.Address, banker std.Banker) *CoinsBanker {
 	if owner == "" {
-		panic("owner address cannot be empty")
+		panic(ErrNoOwnerProvided)
 	}
 
+	// NOTE: Should we add methods to std.Banker to check both its type and the
+	// associated Realm for this kind of case? For example:
+	// if banker.Type() != std.BankerTypeRealmSend { panic("banker must be of type std.BankerTypeRealmSend") }
+	// if banker.Realm().Address() != owner { panic("banker must be owned by the given owner address") }
 	return &CoinsBanker{
-		ownAddress: owner,
+		owner:  owner,
+		banker: banker,
 	}
 }
 
@@ -86,7 +95,7 @@ func (coinsPayment) BankerID() string {
 
 // String implements Payment.
 func (cp coinsPayment) String() string {
-	return cp.coins.String() + " to " + cp.to.String()
+	return cp.coins.String() + " to " + cp.toAddress.String()
 }
 
 // NewCoinsPayment creates a new coinsPayment.
