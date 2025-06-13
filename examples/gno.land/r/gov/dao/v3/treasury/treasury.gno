@@ -30,14 +30,21 @@ func init() {
 		return tokens
 	}
 
-	// Init the tresury bankers.
+	// Init the treasury bankers.
+	coinsBanker, err := t.NewCoinsBanker(std.NewBanker(std.BankerTypeRealmSend))
+	if err != nil {
+		panic("failed to create CoinsBanker: " + err.Error())
+	}
+	grc20Banker, err := t.NewGRC20Banker(grc20regLister)
+	if err != nil {
+		panic("failed to create GRC20Banker: " + err.Error())
+	}
 	bankers := []t.Banker{
-		t.NewCoinsBanker(std.NewBanker(std.BankerTypeRealmSend)),
-		t.NewGRC20Banker(grc20regLister),
+		coinsBanker,
+		grc20Banker,
 	}
 
-	// Create the treasury instance with the defined bankers.
-	var err error
+	// Create the treasury instance with the bankers.
 	treasury, err = t.New(bankers)
 	if err != nil {
 		panic("failed to create treasury: " + err.Error())

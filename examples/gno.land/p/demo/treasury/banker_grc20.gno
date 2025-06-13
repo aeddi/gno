@@ -6,6 +6,12 @@ import (
 	"strconv"
 
 	"gno.land/p/demo/grc/grc20"
+	"gno.land/p/demo/ufmt"
+)
+
+var (
+	ErrNoListerProvided   = errors.New("no lister provided")
+	ErrGRC20TokenNotFound = errors.New("GRC20 token not found")
 )
 
 // GRC20Banker is a Banker that sends GRC20 tokens listed using a getter
@@ -33,7 +39,7 @@ func (gb *GRC20Banker) Send(p Payment) error {
 
 	payment, ok := p.(grc20Payment)
 	if !ok {
-		return errors.New("Payment must be of type grc20Payment")
+		return ufmt.Errorf("%v: %T", ErrInvalidPaymentType, payment)
 	}
 
 	// Get the GRC20 tokens using the lister.
@@ -48,7 +54,7 @@ func (gb *GRC20Banker) Send(p Payment) error {
 		}
 	}
 	if token == nil {
-		return errors.New("GRC20 token not found with symbol: " + payment.symbol)
+		return ufmt.Errorf("%v: %s", ErrGRC20TokenNotFound, payment.symbol)
 	}
 
 	// Send the token.
@@ -83,26 +89,26 @@ func (gb *GRC20Banker) Address() string {
 
 // NewGRC20Banker creates a new GRC20Banker with the current Realm's address
 // as the owner.
-func NewGRC20Banker(lister TokenListerFunc) *GRC20Banker {
+func NewGRC20Banker(lister TokenListerFunc) (*GRC20Banker, error) {
 	owner := std.CurrentRealm().Address()
 
 	return NewGRC20BankerWithOwner(owner, lister)
 }
 
 // NewGRC20BankerWithOwner creates a new GRC20Banker with the given address.
-func NewGRC20BankerWithOwner(owner std.Address, lister TokenListerFunc) *GRC20Banker {
+func NewGRC20BankerWithOwner(owner std.Address, lister TokenListerFunc) (*GRC20Banker, error) {
 	if owner == "" {
-		panic("owner address cannot be empty")
+		return nil, ErrNoOwnerProvided
 	}
 
 	if lister == nil {
-		panic("lister function cannot be nil")
+		return nil, ErrNoListerProvided
 	}
 
 	return &GRC20Banker{
 		owner:  owner,
 		lister: lister,
-	}
+	}, nil
 }
 
 // grc20Payment represents a payment that is issued by a GRC20Banker.

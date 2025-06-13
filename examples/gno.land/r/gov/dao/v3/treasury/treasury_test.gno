@@ -148,7 +148,7 @@ func TestSendGRC20Payment(t *testing.T) {
 	// Try to send a GRC20 payment with a not registered token, it should abort.
 	uassert.AbortsWithMessage(
 		t,
-		"failed to send payment: GRC20 token not found with symbol: UNKNOW",
+		"failed to send payment: GRC20 token not found: UNKNOW",
 		func() {
 			treasury.Send(cross, trs_pkg.NewGRC20Payment("UNKNOW", 100, user1Addr))
 		},
@@ -217,7 +217,7 @@ func TestSendGRC20Payment(t *testing.T) {
 	// Try to send a dummy payment with the GRC20 banker ID, it should abort.
 	uassert.AbortsWithMessage(
 		t,
-		"failed to send payment: Payment must be of type grc20Payment",
+		"failed to send payment: invalid payment type: unknown",
 		func() {
 			treasury.Send(cross, &dummyPayment{bankerID: grc20BankerID})
 		},

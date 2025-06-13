@@ -1,8 +1,13 @@
 package treasury
 
 import (
+	"errors"
 	"std"
+
+	"gno.land/p/demo/ufmt"
 )
+
+var ErrNoStdBankerProvided = errors.New("no std banker provided")
 
 // CoinsBanker is a Banker that sends std.Coins.
 type CoinsBanker struct {
@@ -25,7 +30,7 @@ func (cb *CoinsBanker) Send(p Payment) error {
 	// Check if payment is of type coinsPayment.
 	payment, ok := p.(coinsPayment)
 	if !ok {
-		return ErrInvalidPaymentType
+		return ufmt.Errorf("%v: %T", ErrInvalidPaymentType, payment)
 	}
 
 	// Send the coins.
@@ -58,26 +63,31 @@ func (cb *CoinsBanker) Address() string {
 
 // NewCoinsBanker creates a new CoinsBanker with the current Realm's address
 // as the owner.
-func NewCoinsBanker(banker std.Banker) *CoinsBanker {
+func NewCoinsBanker(banker std.Banker) (*CoinsBanker, error) {
 	owner := std.CurrentRealm().Address()
 
 	return NewCoinsBankerWithOwner(owner, banker)
 }
 
 // NewCoinsBankerWithOwner creates a new CoinsBanker with the given address.
-func NewCoinsBankerWithOwner(owner std.Address, banker std.Banker) *CoinsBanker {
+func NewCoinsBankerWithOwner(owner std.Address, banker std.Banker) (*CoinsBanker, error) {
 	if owner == "" {
-		panic(ErrNoOwnerProvided)
+		return nil, ErrNoOwnerProvided
 	}
 
 	// NOTE: Should we add methods to std.Banker to check both its type and the
-	// associated Realm for this kind of case? For example:
+	// associated Realm for this kind of case?
+	// For example:
 	// if banker.Type() != std.BankerTypeRealmSend { panic("banker must be of type std.BankerTypeRealmSend") }
 	// if banker.Realm().Address() != owner { panic("banker must be owned by the given owner address") }
+	if banker == nil {
+		return nil, ErrNoStdBankerProvided
+	}
+
 	return &CoinsBanker{
 		owner:  owner,
 		banker: banker,
-	}
+	}, nil
 }
 
 // coinsPayment represents a payment that is issued by a CoinsBanker.
