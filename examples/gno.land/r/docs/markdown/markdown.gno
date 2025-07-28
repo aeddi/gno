@@ -66,8 +66,6 @@ Links can be created using the following syntax:
 [Link text](https://example.com)
 [Link with title](https://example.com "Link title")
 
-XXX: custom CSS for internal/external links and if possible for "in the same realm/namespace".
-
 ### Lists
 
 Unordered lists use asterisks, plus signs, or hyphens:
@@ -153,8 +151,6 @@ Horizontal rules are created using three or more asterisks, hyphens, or undersco
 
 ---
 
-<!-- XXX: add again this feature that was removed -->
-<!--
 ### Task Lists
 
 Gno supports task lists for tracking to-do items:
@@ -162,11 +158,44 @@ Gno supports task lists for tracking to-do items:
 ±±±markdown
 - [x] Completed task
 - [ ] Pending task
+- [ ] Another pending task
+- [x] Another completed task
 ±±±
 
 - [x] Completed task
 - [ ] Pending task
--->
+- [ ] Another pending task
+- [x] Another completed task
+
+### Footnotes
+
+Gno supports footnotes for adding references and citations:
+
+±±±markdown
+Here is a sentence with a footnote[^1].
+
+[^1]: This is the footnote content.
+±±±
+
+Here is a sentence with a footnote[^1].
+
+[^1]: This is the footnote content.
+
+You can also use multiple footnotes in the same document:
+
+±±±markdown
+This is the first sentence with a footnote[^1].
+This is another sentence with a different footnote[^2].
+
+[^1]: First footnote content.
+[^2]: Second footnote content with more details.
+±±±
+
+This is the first sentence with a footnote[^1].
+This is another sentence with a different footnote[^2].
+
+[^1]: First footnote content.
+[^2]: Second footnote content with more details.
 
 ## Tables
 
@@ -238,187 +267,507 @@ This approach allows for a more consistent rendering experience across different
 
 ### Columns
 
-Gno Flavored Markdown introduces a column layout system using special HTML-like tags. This system allows content to be organized into multiple vertical columns using heading elements as separators.
-On GnoWeb, up to four columns can be displayed in a single row; exceeding this limit will transfer additional columns to another row, and so on.
+Gno-Flavored Markdown introduces a column layout system that uses special tags. You can create columns with
+±<gno-columns>± blocks and separate the content with ±|||±.
 
 #### Basic Syntax
-Wrap your column content in ±<gno-columns>± tags and use standard markdown headings (from h1 ±#± to h6 ±######±) to define column breaks:
-
 ±±±markdown
 <gno-columns>
-## Column 1 Title
+Left content
 
-Column 1 content
+|||
 
-## Column 2 Title
-
-Column 2 content
+Right content
 </gno-columns>
 ±±±
 
-This will render as:
+- Renders as:
+
+---
 
 <gno-columns>
-## Column 1 Title
+Left content
 
-Column 1 content
+|||
 
-## Column 2 Title
-
-Column 2 content
+Right content
 </gno-columns>
+
 ---
 
 #### Key Features
 
-1. **Heading Levels**: Any heading level from ±#± (h1) to ±######± (h6) can be used as column separators. The first one will be the reference for subsequent separator.
+1. **Multiple Columns**:
+
+Depending on the screen size. A maximum of four rows can be displayed in
+one row.
+
+***Note**: Any overflow will result in items being displayed in the next row. Also, keep in mind that on smaller screens
+(e.g., phones), this overflow may occur with fewer elements.*
 
 ±±±markdown
 <gno-columns>
-# Main Section
+First column
 
-Content
+|||
 
-## Subsection
+Second column
 
-More content
+|||
 
-# Second section
+Third column
 
-Content
+|||
 
-## Subsection
+Fourth column
 
-More content
+|||
+
+Fifth column
 </gno-columns>
 ±±±
 
+- Renders as:
+
+---
+
 <gno-columns>
-## Main Section
-Content
-### Subsection
-More content
-## Second section
-Content
-### Subsection
-More content
+First column
+
+|||
+
+Second column
+
+|||
+
+Third column
+
+|||
+
+Fourth column
+
+|||
+
+Fifth column
 </gno-columns>
 
 ---
 
-2. **Empty Headings**: Use empty headings to create columns without titles:
+2. **Mixed Content**:
+
+Columns can be mixed with any markdown content
+
+***Note**: Nested columns are currently not possible*
 
 ±±±markdown
 <gno-columns>
-###
+### Text Section
+Paragraph with _formatting_
 
-![Alt text](/public/imgs/gnoland.svg "Optional title")
-Content without title
+|||
 
-### Second Column
-
-Another column
+My Image ![Alt](/public/imgs/gnoland.svg)
 </gno-columns>
 ±±±
 
+- Renders as:
+
+---
+
 <gno-columns>
-###
+### Text Section
+Paragraph with _formatting_
 
-![Alt text](/public/imgs/gnoland.svg "Optional title")
-Content without title
+|||
 
-### Second Column
-
-Another column
+My Image ![Alt](/public/imgs/gnoland.svg)
 </gno-columns>
 
+---
 
-#### Validation Rules
+### Forms
 
-The column system will ignore invalid structures and generate errors in the form of comments in the following cases:
+Gno-Flavored Markdown introduces a secure form system that integrates directly with realms. The system uses custom HTML-like tags that are rendered with proper styling and validation.
 
-1. Unclosed Tags
-±±±markdown
-<gno-columns>
-## Title
-Content
-<!-- Missing closing tag -->
-±±±
+#### Basic Usage
 
-2. Nested Columns
-
-Nested columns tag will be ignored, e.g.
+Create a form using the ±<gno-form>± tag and add inputs with ±<gno-input>±:
 
 ±±±markdown
-<gno-columns>
-## Parent
-<gno-columns> <!-- this tag will be ignored -->
-  ## Child
-</gno-columns>
-</gno-columns> <!-- this tag will be ignored -->
+<gno-form>
+  <gno-input name="name" placeholder="Enter your name" />
+  <gno-input name="email" placeholder="Enter your email" />
+</gno-form>
 ±±±
 
-3. Invalid Headings.
+<gno-form>
+  <gno-input name="name" placeholder="Enter your name" />
+  <gno-input name="email" placeholder="Enter your email" />
+</gno-form>
 
-Invalid stating heading will generate an error, e.g.
+#### Form Structure
 
-  - Headings in list:
+1. **Form Container**
+   - Must start with ±<gno-form>± and end with ±</gno-form>±
+   - Optional attributes:
+     - ±path±: Render path after form submission (e.g. ±path="user"± will redirect to ±:user?[params]±)
+   - Form data is always sent as query parameters
+   - Cannot be nested (forms inside forms are not allowed)
+   - Automatically includes a header showing the realm name
+
+2. **Input Fields**
+   - Created with ±<gno-input>± tag
+   - Required attributes:
+     - ±name±: Unique identifier for the input (required)
+     - ±type±: Type of input (optional, defaults to "text")
+     - ±placeholder±: Hint text shown in the input (optional, defaults to "Enter value")
+     - ±description±: Description of the input as title (optional - can be used as title for group of one or multiple inputs)
+   - Supported input types:
+     - ±type="text"± (default): For text input
+     - ±type="number"±: For numeric values only (with browser validation)
+     - ±type="email"±: For email addresses (with basic browser validation)
+     - ±type="tel"±: For phone numbers (no specific validation)
+     - ±type="password"±: For password input (masked characters)
+     - ±type="radio"±: For single selection from a group (requires ±value± attribute)
+     - ±type="checkbox"±: For multiple selections (requires ±value± attribute)
+   - Additional attributes for radio/checkbox:
+     - ±value±: The value to submit when selected (required for radio/checkbox)
+     - ±checked±: Set to "true" to pre-select the option (optional)
+   - Note: Input validation is handled by the browser's HTML5 validation
+   - Any other type will default to "text"
+   - Each input must have a unique name
+   - Inputs are rendered with labels and proper styling
+
+3. **Textarea Fields**
+   - Created with ±<gno-textarea>± tag
+   - Required attributes:
+     - ±name±: Unique identifier for the textarea (required)
+     - ±placeholder±: Hint text shown in the textarea (optional, defaults to "Enter value")
+   - Optional attributes:
+     - ±rows±: Number of visible rows (2-10, defaults to 4)
+   - Perfect for longer text input like messages, descriptions, or comments
+   - Each textarea must have a unique name
+   - Textareas are rendered with labels and proper styling
+
+4. **Select Fields**
+   - Created with ±<gno-select>± tag (similar to radio buttons)
+   - Required attributes:
+     - ±name±: Unique identifier for the select group (required). Use underscores to separate words.
+     - ±value±: The value to submit and display text (required)
+   - Optional attributes:
+     - ±description±: Description of the select group (optional)
+     - ±selected±: Set to "true" to pre-select the option (optional)
+   - Multiple ±<gno-select>± elements with the same ±name± form a select group
+   - All options with the same ±name± form a group where only one can be selected
+   - The ±value± attribute serves both as the submitted value and the displayed text
+
+#### Example Use Cases
+
+1. Form with Path and Query Parameters
 ±±±markdown
-<gno-columns>
-- ## List Heading
-</gno-columns>
+<gno-form path="user">
+  <gno-input name="username" type="text" placeholder="Enter username" />
+  <gno-input name="age" type="number" placeholder="Your age" />
+</gno-form>
 ±±±
 
-  - Headings beyond h6:
+<gno-form path="user">
+  <gno-input name="username" type="text" placeholder="Enter username" />
+  <gno-input name="age" type="number" placeholder="Your age" />
+</gno-form>
+
+This form will submit to ±:user?username=value&age=value± on the same realm.
+
+2. Form with Query Parameters Only
 ±±±markdown
-<gno-columns>
-####### Invalid
-</gno-columns>
+<gno-form>
+  <gno-input name="recipient" type="text" placeholder="Enter recipient address" description="Recipient Information" />
+  <gno-input name="email" type="email" placeholder="Your email" />
+  <gno-input name="pswd" type="password" placeholder="Your password" />
+</gno-form>
 ±±±
 
-4. Content Before First Heading
+<gno-form>
+  <gno-input name="recipient" type="text" placeholder="Enter recipient address" description="Recipient Information" />
+  <gno-input name="email" type="email" placeholder="Your email" />
+  <gno-input name="pswd" type="password" placeholder="Your password" />
+</gno-form>
 
-Setting content before first heading, is considered as invalid and will generate an error.
+This form will submit to ±?recipient=value&email=value&pswd=value± on the same realm.
+
+3. Form with Radio Buttons
+±±±markdown
+<gno-form>
+  <gno-input name="color" type="radio" value="blue" description="What is your favorite color?" />
+  <gno-input name="color" type="radio" value="red" />
+  <gno-input name="color" type="radio" value="green" />
+</gno-form>
+±±±
+
+<gno-form>
+  <gno-input name="color" type="radio" value="blue" description="What is your favorite color?" />
+  <gno-input name="color" type="radio" value="red" />
+  <gno-input name="color" type="radio" value="green" />
+</gno-form>
+
+Radio buttons allow users to select one option from a group. All radio buttons with the same ±name± form a group where only one can be selected.
+
+4. Form with Checkboxes
+±±±markdown
+<gno-form>
+  <gno-input name="interests" type="checkbox" value="coding" description="What do you like to do?"/>
+  <gno-input name="interests" type="checkbox" value="gaming" />
+  <gno-input name="interests" type="checkbox" value="reading" />
+  <gno-input name="newsletter" type="checkbox" value="subscribe" description="Subscribe to newsletter" placeholder="To get the latest news" checked="true" />
+</gno-form>
+±±±
+
+<gno-form>
+  <gno-input name="interests" type="checkbox" value="coding" description="What do you like to do?" />
+  <gno-input name="interests" type="checkbox" value="gaming" />
+  <gno-input name="interests" type="checkbox" value="reading" />
+  <gno-input name="newsletter" type="checkbox" value="subscribe" description="Subscribe to newsletter" placeholder="To get the latest news" checked="true" />
+</gno-form>
+
+Checkboxes allow users to select multiple options. Use ±checked="true"± to pre-select a checkbox.
+
+5. Form with Textarea
+±±±markdown
+<gno-form>
+  <gno-input name="message" type="text" placeholder="Subject" />
+  <gno-textarea name="content" placeholder="Enter your message here" rows="6" />
+</gno-form>
+±±±
+
+<gno-form>
+  <gno-input name="message" type="text" placeholder="Subject" />
+  <gno-textarea name="content" placeholder="Enter your message here" rows="6" />
+</gno-form>
+
+Textareas are perfect for longer text input. The ±rows± attribute controls the height (4-10 rows, default is 4).
+
+6. Form with Select Options
+±±±markdown
+<gno-form>
+  <gno-select name="country" value="United States" description="Select your country" />
+  <gno-select name="country" value="France" />
+  <gno-select name="country" value="Germany" />
+</gno-form>
+±±±
+
+<gno-form>
+  <gno-select name="country" value="United States" description="Select your country" selected="true" />
+  <gno-select name="country" value="France" />
+  <gno-select name="country" value="Germany" />
+</gno-form>
+
+Select options work like radio buttons but with a more semantic meaning. All ±<gno-select>± elements with the same ±name± form a group where only one can be selected. Use ±selected="true"± to pre-select an option. The ±value± attribute serves both as the submitted value and the displayed text.
+
+7. Complex Form with Mixed Elements
+±±±markdown
+<gno-form path="contact">
+  <gno-input name="name" type="text" placeholder="Your full name" description="Your Information" />
+  <gno-input name="email" type="email" placeholder="Your email address" />
+  <gno-input name="age" type="number" placeholder="Your age" />
+  
+  <gno-input name="color" type="radio" value="blue" description="What is your favorite color?" />
+  <gno-input name="color" type="radio" value="red" />
+  <gno-input name="color" type="radio" value="green" />
+  
+  <gno-input name="interests" type="checkbox" value="tech" description="What do you like to do?" />
+  <gno-input name="interests" type="checkbox" value="sports" />
+  <gno-input name="interests" type="checkbox" value="music"/>
+  
+  <gno-select name="country" value="us" text="United States" description="Select your country" />
+  <gno-select name="country" value="fr" text="France" />
+  <gno-select name="country" value="de" text="Germany" />
+  
+  <gno-textarea name="message" placeholder="Tell us about yourself" rows="5" />
+</gno-form>
+±±±
+
+<gno-form path="contact">
+  <gno-input name="name" type="text" placeholder="Your full name" description="Your Information" />
+  <gno-input name="email" type="email" placeholder="Your email address" />
+  <gno-input name="age" type="number" placeholder="Your age" />
+  
+  <gno-input name="color" type="radio" value="blue" description="What is your favorite color?" />
+  <gno-input name="color" type="radio" value="red" />
+  <gno-input name="color" type="radio" value="green" />
+  
+  <gno-input name="interests" type="checkbox" value="tech" description="What do you like to do?" />
+  <gno-input name="interests" type="checkbox" value="sports" />
+  <gno-input name="interests" type="checkbox" value="music"/>
+  
+  <gno-select name="country" value="us" text="United States" description="Select your country" />
+  <gno-select name="country" value="fr" text="France" />
+  <gno-select name="country" value="de" text="Germany" />
+  
+  <gno-textarea name="message" placeholder="Tell us about yourself" rows="5" />
+</gno-form>
+
+This example shows how to combine all form element types in a single form.
+
+#### Important Rules
+
+1. **Validation Rules**:
+   - Every ±<gno-input>± must have a ±name± attribute
+   - Every ±<gno-textarea>± must have a ±name± attribute
+   - Every ±<gno-select>± must have a ±name± and ±value± attribute
+   - Duplicate attribute names are not allowed (except for radio, checkbox, and select groups)
+   - Forms must be properly closed
+   - Nested forms will not render
+   - Radio and checkbox inputs must have a ±value± attribute
+   - The ±checked± attribute is only valid for radio and checkbox inputs
+   - The ±selected± attribute is only valid for ±<gno-select>± elements
+   - Textarea ±rows± attribute must be between 2 and 10 (defaults to 4 if invalid or not specified)
+
+2. **Security Features**:
+   - Forms are processed on the realm where they are defined
+   - Each form submission is associated with its realm
+   - The realm name is displayed in the form header
+   - Input validation is handled by the realm's smart contract
+
+--- 
+
+### Alerts
+
+Alerts are a way to highlight important information in your markdown.
+
+There are five types of alerts:
+
+- INFO
+- NOTE
+- TIP
+- SUCCESS
+- WARNING
+- CAUTION
+
+**NOTE**: The default alert type is INFO (if a wrong alert type is used).
+
+The alert boxes are expandable/collapsible and can have a title. 
+By default, the alert boxes are opened. The title is optional and if not provided, the alert type will be used as the title.
 
 ±±±markdown
-<gno-columns>
-Invalid content
-## Title
-</gno-columns>
+> [!NOTE]
+> This is a note
 ±±±
 
-#### Best Pratices
-- Always start column content with a heading
-- Maintain consistent heading levels within a columns block
-- Close tags immediately after final column content
-- Prefer simple markdown structures within columns
-- Use empty headings (##) for image-focused columns
-
-### Usernames
-
-XXX: TODO (add again this feature that was removed)
-
-<!--
-±±±markdown
-@username
-@dev123
-±±±
-
-@username
-@dev123
--->
-
-### Bech32 Addresses
-
-XXX: TODO
-
-Gno markdown can automatically recognize and render Bech32 addresses.
+> [!NOTE]
+> This is a note
 
 ±±±markdown
-g1jg955hm9a6f0yen878c2hur6q7stqz7rzpyrwpe
+> [!NOTE]-
+> This is a closed note
 ±±±
 
-g1jg955hm9a6f0yen878c2hur6q7stqz7rzpyrwpe
+> [!NOTE]-
+> This is a closed note
+
+±±±markdown
+> [!NOTE] This is a note with title
+> This is a note with title
+±±±
+
+> [!NOTE] This is a note with title
+> This is a note with title
+
+±±±markdown
+> [!INFO]
+> This is an info
+±±±
+
+> [!INFO]
+> This is an info
+
+±±±markdown
+> [!TIP]
+> This is a tip
+±±±
+
+> [!TIP]
+> This is a tip
+
+±±±
+> [!SUCCESS]
+> This is a success
+±±±
+
+> [!SUCCESS]
+> This is a success
+
+±±±
+> [!WARNING]
+> This is a warning
+±±±
+
+> [!WARNING]
+> This is a warning
+
+±±±
+> [!CAUTION]
+> This is a caution
+±±±
+
+> [!CAUTION]
+> This is a caution
+
+±±±markdown
+> [!FOO]
+> The default alert if a wrong alert type is used
+±±±
+
+> [!FOO]
+> This is the default alert
+
+±±±markdown
+> [!NOTE]
+> This is a note
+> > [!NOTE]
+> > This is a scoped note
+±±±
+
+> [!NOTE]
+> This is a note
+> > [!NOTE]
+> > This is a scoped note
+
+### User Mentions and Bech32 Addresses
+
+Gno markdown automatically recognizes and renders user mentions and Bech32 addresses as clickable links.
+
+#### User Mentions
+
+// You can mention users using the "@" symbol followed by a username. The username can contain letters, numbers, and underscores.
+
+±±±markdown
+Hello @alice, how are you doing?
+
+This is a mention of @bob_user and @test-123.
+
+You can also mention users like @user_name_123.
+±±±
+
+
+Hello @alice, how are you doing?
+
+This is a mention of @bob_user.
+
+You can also mention users like @user_name_123.
+
+#### Bech32 Addresses
+
+Gno markdown can automatically recognize and render valid Bech32 addresses as clickable links.
+
+±±±markdown
+This is a GNO address: g1jg8mtutu9khhfwc4nxmuhcpftf0pajdhfvsqf5
+
+You can also reference g1abc123def456ghi789jkl012mno345pqr678stu901vwx234yz5.
+±±±
+
+This is a GNO address: g1jg8mtutu9khhfwc4nxmuhcpftf0pajdhfvsqf5
+
+You can also reference g1abc123def456ghi789jkl012mno345pqr678stu901vwx234yz5.
 
 ### Smart Contract Integration
 
@@ -454,6 +803,10 @@ The markdown support in Gno is being actively developed. Future enhancements may
 Markdown on Gno provides a familiar syntax for developers who have experience with GitHub Flavored Markdown, while adding blockchain-specific extensions that make it more powerful in the context of the Gno platform.
 
 As the Gno ecosystem grows, expect the markdown capabilities to expand accordingly, providing even richer formatting and interactive elements for documentation and user interfaces.
+
+## See Also
+
+For programmatic markdown generation using Go code, check out the [±p/moul/md± demo](/r/docs/moul_md) which demonstrates how to use the ±p/moul/md± package to generate markdown content in your Gno realms.
 `
 	output = strings.ReplaceAll(output, "±", "`")
 	return output
