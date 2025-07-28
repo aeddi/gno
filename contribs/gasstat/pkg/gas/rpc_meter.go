@@ -11,7 +11,6 @@ import (
 	"github.com/gnolang/gno/gno.land/pkg/gnoclient"
 	"github.com/gnolang/gno/gno.land/pkg/gnoland/ugnot"
 	"github.com/gnolang/gno/gno.land/pkg/sdk/vm"
-	"github.com/gnolang/gno/gnovm"
 	rpcclient "github.com/gnolang/gno/tm2/pkg/bft/rpc/client"
 	ctypes "github.com/gnolang/gno/tm2/pkg/bft/rpc/core/types"
 	"github.com/gnolang/gno/tm2/pkg/crypto"
@@ -44,8 +43,8 @@ type CallCfg struct {
 // RunCfg represents the configuration for a run operation.
 type RunCfg struct {
 	BaseCfg  `json:",inline" yaml:",inline"`
-	Send     std.Coins        `json:"send" yaml:"send"`
-	MemFiles []*gnovm.MemFile `json:"mem_files" yaml:"mem_files"`
+	Send     std.Coins      `json:"send" yaml:"send"`
+	MemFiles []*std.MemFile `json:"mem_files" yaml:"mem_files"`
 }
 
 // TransferCfg represents the configuration for a bank transfer operation.
@@ -58,9 +57,9 @@ type TransferCfg struct {
 // AddPkgCfg represents the configuration for adding a package.
 type AddPkgCfg struct {
 	BaseCfg  `json:",inline" yaml:",inline"`
-	PkgPath  string           `json:"pkg_path" yaml:"pkg_path"`
-	MemFiles []*gnovm.MemFile `json:"mem_files" yaml:"mem_files"`
-	Deposit  std.Coins        `json:"deposit" yaml:"deposit"`
+	PkgPath  string         `json:"pkg_path" yaml:"pkg_path"`
+	MemFiles []*std.MemFile `json:"mem_files" yaml:"mem_files"`
+	Deposit  std.Coins      `json:"deposit" yaml:"deposit"`
 }
 
 // BaseCfg represents the base configuration for all operations.
@@ -109,7 +108,7 @@ func execRequest(
 }
 
 // memFilesToFiles converts a slice of MemFile to a slice of File.
-func memFilesToFiles(pkgPath string, memFiles []*gnovm.MemFile) []File {
+func memFilesToFiles(pkgPath string, memFiles []*std.MemFile) []File {
 	files := make([]File, len(memFiles))
 
 	for i, memFile := range memFiles {
