@@ -329,7 +329,7 @@ func measureAddPkgs(clients []gnoclient.Client, addPkgCfgs []AddPkgCfg) ([]AddPk
 			addPkgCfg.AccountIndex,
 			func(client gnoclient.Client, addr crypto.Address) (*ctypes.ResultBroadcastTxCommit, error) {
 				msgAddPkg := vm.NewMsgAddPackage(addr, addPkgCfg.PkgPath, addPkgCfg.MemFiles)
-				msgAddPkg.Deposit = addPkgCfg.Deposit
+				msgAddPkg.MaxDeposit = addPkgCfg.Deposit
 				return client.AddPackage(addPkgCfg.BaseTxCfg, msgAddPkg)
 			},
 		)
